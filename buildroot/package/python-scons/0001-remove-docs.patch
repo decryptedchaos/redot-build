@@ -1,0 +1,33 @@
+diff -urN SCons-4.5.2/MANIFEST.in SCons-4.5.2.new/MANIFEST.in
+--- SCons-4.5.2/MANIFEST.in	2023-01-24 05:14:53.000000000 +0100
++++ SCons-4.5.2.new/MANIFEST.in	2023-10-31 21:31:57.320046155 +0100
+@@ -1,10 +1,8 @@
+-recursive-include SCons/Tool/docbook *
+ 
+ # For license file
+ include LICENSE
+ 
+ include scons.1 sconsign.1 scons-time.1
+-recursive-include build/doc/man *.1
+ 
+ 
+ 
+diff -urN SCons-4.5.2/setup.cfg SCons-4.5.2.new/setup.cfg
+--- SCons-4.5.2/setup.cfg	2023-03-21 17:11:43.492238000 +0100
++++ SCons-4.5.2.new/setup.cfg	2023-10-31 21:32:20.359093931 +0100
+@@ -55,14 +55,6 @@
+ 	sconsign = SCons.Utilities.sconsign:main
+ 	scons-configure-cache = SCons.Utilities.ConfigureCache:main
+ 
+-[options.package_data]
+-* = *.txt, *.rst, *.1
+-SCons.Tool.docbook = *.*
+-
+-[options.data_files]
+-. = scons.1
+-	scons-time.1
+-	sconsign.1
+ 
+ [sdist]
+ dist_dir = build/dist
+

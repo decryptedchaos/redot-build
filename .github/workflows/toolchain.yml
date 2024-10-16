@@ -1,0 +1,11 @@
+name: Redot Build Toolchains
+on:
+  workflow_dispatch:
+    inputs:
+      make-release:
+        description: "Build a release"
+        required: true
+        type: boolean
+        default: false
+
+jobs:

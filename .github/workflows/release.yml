@@ -1,0 +1,163 @@
+name: Redot Build Release
+on:
+  workflow_dispatch:
+    inputs:
+      make-release:
+        description: "Build a release"
+        required: true
+        type: boolean
+        default: false
+      version:
+        description: "What version to build"
+        required: true
+        type: string
+        
+# Global Settings
+# SCONS_CACHE for windows must be set in the build environment
+env:
+  REDOT_BASE_VERSION: 4.3
+  REDOT_BASE_VERSION_STATUS: stable
+  REDOT_VERSION_STATUS: custom
+  REDOT_MONO_BUILD_TAG: release-5299efd # mono-6.12.0.182
+  REDOT_MONO_BUILD_REPO: godotengine/godot-mono-builds
+  
+jobs:
+  linux:
+    runs-on: "ubuntu-latest"
+    name: 🐧 Linux ${{ matrix.name }}
+    env:
+      SCONSFLAGS: mono_static=yes
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Editor & Templates
+            cache-name: linux
+            build-mono: false
+
+          - name: Editor & Templates w/ Mono
+            cache-name: linux-mono
+            build-mono: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout Redot source
+        uses: actions/checkout@v4
+        with:
+          repository: 'Redot-Engine/redot-engine'
+          path: 'build'
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.version }}
+
+      - name: Linux dependencies
+        shell: bash
+        run: |
+          sudo apt-get install xvfb libc6-dev
+
+      # Linux Toolchain Setup
+      - name: Setup Linux toolchain (x86_64)
+        uses: ./.github/actions/godot-linux-toolchain
+        with:
+          toolchain-name: "x86_64-godot-linux-gnu_sdk-buildroot"
+
+      - name: Setup Linux toolchain (i686)
+        uses: ./.github/actions/godot-linux-toolchain
+        with:
+          toolchain-name: "i686-godot-linux-gnu_sdk-buildroot"
+
+      # Cache
+      - name: Setup Godot build cache
+        uses: ./.github/actions/godot-cache
+        with:
+          cache-name: ${{ matrix.cache-name }}
+        continue-on-error: true
+
+      - name: Setup python and scons
+        uses: ./.github/actions/godot-deps
+
+      # Mono Setup
+      - name: Setup mono (x86_64)
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-mono
+        with:
+          mono-release: "linux-x86_64"
+          mono-bcl: "bcl-desktop"
+
+      - name: Setup mono (x86)
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-mono
+        with:
+          mono-release: "linux-x86"
+
+      - name: Mono precompilation
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-build
+        with:
+          buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ matrix.sconsflags }} module_mono_enabled=yes mono_glue=no copy_mono_root=yes mono_bcl=$HOME/mono-bcls/desktop-bcl/net_4_x mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release
+          platform: linuxbsd
+          tools: true
+
+      # Generate mono glue
+      - name: Generate Mono glue code
+        if: ${{ matrix.build-mono }}
+        run: |
+          DRI_PRIME=0 xvfb-run "./bin/godot.x11.tools.64.mono" --generate-mono-glue modules/mono/glue || true
+
+      - name: Set Mono scons flags
+        if: ${{ matrix.build-mono }}
+        run: |
+          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/desktop-bcl/net_4_x" >> $GITHUB_ENV
+
+      - name: Clear bin
+        run: |
+          rm -rf bin
+
+      # Editor
+      - name: Compilation (bits=64)
+        uses: ./.github/actions/godot-build
+        with:
+          buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release' || '' }}
+          platform: linuxbsd
+          target: release_debug
+          tools: true
+
+      - name: Upload Editor (bits=64)
+        uses: ./.github/actions/upload-artifact
+        with:
+          name: ${{ matrix.cache-name }}-editor-64
+
+      - name: Clear bin
+        run: |
+          rm -rf bin
+
+      # Templates
+      - name: Compilation (tools=false, bits=64, target=release_debug)
+        uses: ./.github/actions/godot-build
+        with:
+          buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release' || '' }}
+          platform: linuxbsd
+          target: release_debug
+          tools: false
+
+      - name: Compilation (tools=false, bits=64, target=release)
+        uses: ./.github/actions/godot-build
+        with:
+          buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release' || '' }} debug_symbols=no
+          platform: linuxbsd
+          target: release
+          tools: false
+
+      - name: Upload Templates (bits=64)
+        uses: ./.github/actions/upload-artifact
+        with:
+          name: ${{ matrix.cache-name }}-templates-64
+
+      - name: Clear bin
+        run: |
+          rm -rf bin
