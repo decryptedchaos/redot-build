@@ -7,6 +7,19 @@ on:
         required: true
         type: boolean
         default: false
+      build-type:
+        description: "What type of build"
+        required: true
+        type: choice
+        default: all
+        options:
+          - all
+          - linux
+          - windows
+          - osx
+          - ios
+          - web
+          - android
       version:
         description: "What version to build"
         required: true
@@ -26,6 +39,7 @@ jobs:
   linux:
     runs-on: "ubuntu-latest"
     name: Linux ${{ matrix.name }}
+    if: ${{ (github.event.inputs.build-type == 'all') || (github.event.inputs.build-type == 'linux') }}
     env:
       SCONSFLAGS: mono_static=yes
     strategy:
@@ -34,10 +48,12 @@ jobs:
         include:
           - name: Editor & Templates
             cache-name: linux
+            bin: ./redot-engine/bin/redot.linuxbsd.editor.x86_64
             build-mono: false
 
           - name: Editor & Templates w/ Mono
             cache-name: linux-mono
+            bin: ./redot-engine/bin/redot.linuxbsd.editor.x86_64.mono
             build-mono: true
 
     steps:
@@ -54,7 +70,11 @@ jobs:
       - name: Linux dependencies
         shell: bash
         run: |
-          sudo apt update && sudo apt-get install -y xvfb libc6-dev p7zip-full p7zip-rar libwayland-dev
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EB8B81E14DA65431D7504EA8F63F0F2B90935439
+          sudo add-apt-repository -y "deb https://ppa.launchpadcontent.net/kisak/turtle/ubuntu focal main"
+          sudo apt update && sudo apt-get install -y xvfb libc6-dev p7zip-full p7zip-rar libwayland-dev \
+            mesa-vulkan-drivers dotnet-sdk-8.0
 
       # Linux Toolchain Setup
       - name: Setup Linux toolchain
@@ -94,7 +114,7 @@ jobs:
       - name: Generate Mono glue code
         if: ${{ matrix.build-mono }}
         run: |
-          DRI_PRIME=0 xvfb-run "./bin/godot.x11.tools.64.mono" --generate-mono-glue modules/mono/glue || true
+          DRI_PRIME=0 xvfb-run "./bin/redot.x11.tools.64.mono" --generate-mono-glue modules/mono/glue || true
 
       - name: Set Mono scons flags
         if: ${{ matrix.build-mono }}
@@ -114,6 +134,22 @@ jobs:
           platform: linuxbsd
           target: editor
           tools: true
+
+      - name: Generate C# glue
+        if: ${{ matrix.build-mono }}
+        run: |
+          ${{ matrix.bin }} --headless --generate-mono-glue ./redot-engine/modules/mono/glue
+
+      - name: Build .NET solutions
+        if: ${{ matrix.build-mono }}
+        run: |
+          ./redot-engine/modules/mono/build_scripts/build_assemblies.py --godot-output-dir=./redot-engine/bin --godot-platform=linuxbsd
+
+      - name: Prep Executables
+        shell: bash
+        run: |
+          strip redot-engine/bin/redot.*
+          chmod +x redot-engine/bin/redot.*
 
       - name: Upload Editor
         uses: ./.github/actions/upload-artifact
