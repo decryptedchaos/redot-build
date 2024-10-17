@@ -1,0 +1,24 @@
+name: Setup Buildroot
+description: Setup Linux toolchain for making Linux builds of Godot.
+inputs:
+  toolchain-name:
+    description: The release tag to use.
+    default: "x86_64-redot-linux-gnu_sdk-buildroot"
+  workingdir:
+    description: Sub directory to work in
+    default: "redot-engine"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download toolchain
+      shell: bash
+      run: |
+        cd "${{ inputs.workingdir }}"
+        # https://github.com/trashguy/redot-build/releases/latest/x86_64-redot-linux-gnu_sdk-buildroot.tar.bz2
+        # curl -L https://github.com/trashguy/redot-build/releases/download/test/${{ inputs.toolchain-name }}.tar.bz2 > ${{ inputs.toolchain-name }}.tar.bz2
+        curl -L https://github.com/trashguy/redot-build/releases/download/test/x86_64-redot-linux-gnu_sdk-buildroot.tar.bz2 > x86_64-redot-linux-gnu_sdk-buildroot.tar.bz2
+        # tar xf ${{ inputs.toolchain-name }}.tar.
+        tar xf x86_64-redot-linux-gnu_sdk-buildroot.tar.bz2
+        chmod +x x86_64-redot-linux-gnu_sdk-buildroot/relocate-sdk.sh
+        "x86_64-redot-linux-gnu_sdk-buildroot/relocate-sdk.sh"

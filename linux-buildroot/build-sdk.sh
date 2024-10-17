@@ -60,7 +60,7 @@ fi
 
 function build_linux_sdk() {
   docker build -f Dockerfile.linux-builder -t redot-buildroot-builder-linux .
-  docker run -it --rm -v $(pwd):/tmp/buildroot:z -w /tmp/buildroot -e FORCE_UNSAFE_CONFIGURE=1 -u $(id -u):$(id -g) redot-buildroot-builder-linux bash -c "make clean; make syncconfig; make sdk"
+  docker run -it --rm -v $(pwd):/tmp/buildroot -w /tmp/buildroot -e FORCE_UNSAFE_CONFIGURE=1 -u $(id -u):$(id -g) redot-buildroot-builder-linux bash -c "make clean; make syncconfig; make sdk"
 
   mkdir -p redot-toolchains
 
