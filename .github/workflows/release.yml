@@ -119,6 +119,7 @@ jobs:
         uses: ./.github/actions/upload-artifact
         with:
           name: ${{ matrix.cache-name }}-editor-64
+          path: redot-engine/bin
 
       - name: Clear bin
         run: |
@@ -147,6 +148,7 @@ jobs:
         uses: ./.github/actions/upload-artifact
         with:
           name: ${{ matrix.cache-name }}-templates-64
+          path: redot-engine/bin
 
       - name: Clear bin
         run: |
