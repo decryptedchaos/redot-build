@@ -279,7 +279,7 @@ jobs:
           sconsflags: mono_static=yes module_mono_enabled=yes mono_glue=no
           platform: windows
           tools: true
-
+          
       # Generate mono glue
       - name: Generate Mono glue code
         if: ${{ matrix.build-mono }}
@@ -311,6 +311,7 @@ jobs:
           platform: windows
           target: editor
           tools: true
+        
 
       - name: Generate C# glue
         if: ${{ matrix.build-mono }}
