@@ -9,7 +9,7 @@ inputs:
     default: ""
   target:
     description: The scons target (debug/release_debug/release).
-    default: ""
+    default: false
   tools:
     description: If tools are to be built.
     default: false
