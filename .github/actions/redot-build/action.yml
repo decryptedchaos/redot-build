@@ -7,9 +7,9 @@ inputs:
   buildroot:
     description: Build root to add to the PATH before building Redot
     default: ""
-  target:
-    description: The scons target (debug/release_debug/release).
-    default: false
+  # target:
+  #   description: The scons target (debug/release_debug/release).
+  #   default: false
   tools:
     description: If tools are to be built.
     default: false
