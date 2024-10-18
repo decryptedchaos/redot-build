@@ -57,6 +57,6 @@ runs:
         mkdir -p ${{ inputs.mono-bcl-path }}
         unzip -o "${{ inputs.mono-bcl }}.zip" -dtemp
         pushd temp
-        mv -v * ${{ inputs.mono-bcl-path }}
+        cp -rf * ${{ inputs.mono-bcl-path }}
         popd
         rm -r temp
