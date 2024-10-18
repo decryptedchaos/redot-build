@@ -40,7 +40,7 @@ runs:
       if: ${{ inputs.mono-release != ' ' }}
       shell: bash
       run: |
-        unzip "${{ inputs.mono-release }}.zip" -d${{ inputs.mono-installs-path }}
+        unzip -o "${{ inputs.mono-release }}.zip" -d${{ inputs.mono-installs-path }}
 
     - name: Download mono base class library ${{ inputs.mono-bcl }}
       if: ${{ inputs.mono-bcl != ' ' }}
@@ -55,7 +55,7 @@ runs:
       shell: bash
       run: |
         mkdir -p ${{ inputs.mono-bcl-path }}
-        unzip "${{ inputs.mono-bcl }}.zip" -dtemp
+        unzip -o "${{ inputs.mono-bcl }}.zip" -dtemp
         pushd temp
         mv -v * ${{ inputs.mono-bcl-path }}
         popd
