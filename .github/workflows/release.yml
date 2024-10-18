@@ -260,8 +260,9 @@ jobs:
         if: ${{ matrix.build-mono }}
         uses: ./.github/actions/redot-mono
         with:
-          mono-bcl: "bcl-desktop-win32"
           mono-release: "windows-x86_64"
+          mono-bcl: "bcl-desktop-win32"
+          
 
       # Mono Setup
       - name: Setup mono
