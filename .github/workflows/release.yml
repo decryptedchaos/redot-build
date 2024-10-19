@@ -278,7 +278,7 @@ jobs:
         with:
           sconsflags: mono_static=yes module_mono_enabled=yes mono_glue=no
           platform: windows
-          target: template_release
+          target: editor
           tools: true
 
       # Generate mono glue
