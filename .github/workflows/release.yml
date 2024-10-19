@@ -285,7 +285,7 @@ jobs:
       - name: Generate Mono glue code
         if: ${{ matrix.build-mono }}
         run: |
-          DRI_PRIME=0 xvfb-run "./bin/redot.x11.tools.64.mono" --generate-mono-glue modules/mono/glue || true
+          DRI_PRIME=0 xvfb-run "./bin/redot.windows.editor.x86_64.mono.exe" --generate-mono-glue modules/mono/glue || true
 
       - name: Set Mono scons flags
         if: ${{ matrix.build-mono }}
