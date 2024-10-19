@@ -285,7 +285,7 @@ jobs:
       - name: Generate Mono glue code
         if: ${{ matrix.build-mono }}
         run: |
-          DRI_PRIME=0 xvfb-run "${{ matrix.bin }}" --generate-mono-glue modules/mono/glue || true
+          DRI_PRIME=0 xvfb-run "./redot-engine/bin/redot.linuxbsd.editor.x86_64.mono" --generate-mono-glue modules/mono/glue || true
 
       - name: Set Mono scons flags
         if: ${{ matrix.build-mono }}
@@ -294,7 +294,7 @@ jobs:
 
       - name: Generate Glue Code
         if:  ${{ matrix.build-mono }}
-        run: ${{ matrix.bin }} --headless --generate-mono-glue modules/mono/glue
+        run: ./redot-engine/bin/redot.linuxbsd.editor.x86_64.mono --headless --generate-mono-glue modules/mono/glue
 
       - name: Build GodotSharp
         if:  ${{ matrix.build-mono }}
