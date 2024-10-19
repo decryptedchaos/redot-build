@@ -277,7 +277,7 @@ jobs:
         uses: ./.github/actions/redot-build
         with:
           sconsflags: mono_static=yes module_mono_enabled=yes mono_glue=no
-          platform: windows
+          platform: linuxbsd
           target: editor
           tools: true
 
@@ -285,7 +285,7 @@ jobs:
       - name: Generate Mono glue code
         if: ${{ matrix.build-mono }}
         run: |
-          DRI_PRIME=0 xvfb-run "./bin/redot.windows.editor.x86_64.mono.exe" --generate-mono-glue modules/mono/glue || true
+          DRI_PRIME=0 xvfb-run "./bin/redot.linux.editor.x86_64.mono" --generate-mono-glue modules/mono/glue || true
 
       - name: Set Mono scons flags
         if: ${{ matrix.build-mono }}
@@ -294,7 +294,7 @@ jobs:
 
       - name: Generate Glue Code
         if:  ${{ matrix.build-mono }}
-        run: ./bin/redot.windows.editor.x86_64.mono.exe --headless --generate-mono-glue modules/mono/glue
+        run: ./bin/redot.linux.editor.x86_64.mono --headless --generate-mono-glue modules/mono/glue
 
       - name: Build GodotSharp
         if:  ${{ matrix.build-mono }}
