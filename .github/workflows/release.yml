@@ -232,7 +232,7 @@ jobs:
           wget https://packages.microsoft.com/config/debian/12/prod.list
           sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
           sudo mv microsoft.asc.gpg $(cat /etc/apt/sources.list.d/microsoft-prod.list | grep -oP "(?<=signed-by=).*(?=\])")
-          sudo add-apt-repository -y "deb https://ppa.launchpadcontent.net/kisak/turtle/ubuntu focal main"
+          #sudo add-apt-repository -y "deb https://ppa.launchpadcontent.net/kisak/turtle/ubuntu focal main"
           sudo apt update && sudo apt-get install -y xvfb libc6-dev p7zip-full p7zip-rar libwayland-dev \
             mesa-vulkan-drivers dotnet-sdk-8.0 unzip
           # The actual dependencies
