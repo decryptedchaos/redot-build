@@ -298,7 +298,7 @@ jobs:
 
       - name: Build GodotSharp
         if:  ${{ matrix.build-mono }}
-        run: python modules/mono/build_scripts/build_assemblies.py --godot-output-dir=./bin
+        run: python modules/mono/build_scripts/build_assemblies.py --godot-output-dir=./redot-engine/bin
 
       - name: Clear bin
         run: |
