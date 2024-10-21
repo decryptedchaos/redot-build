@@ -190,7 +190,7 @@ jobs:
   #       run: |
   #         rm -rf bin
   windows:
-    runs-on: "ubuntu-latest"
+    runs-on: "self-hosted"
     name: 🏁 Windows-64 ${{ matrix.name }}
     if: github.event.inputs.platform == 'windows' || 'all'
     env:
