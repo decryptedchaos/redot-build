@@ -1,9 +1,9 @@
 name: Build Redot
 description: Build Redot with the provided options.
 inputs:
-  workingdir:
-    description: Sub directory to work in
-    default: "redot-engine"
+#  workingdir:
+#    description: Sub directory to work in
+#    default: "redot-engine"
   buildroot:
     description: Build root to add to the PATH before building Redot
     default: ""
