@@ -23,5 +23,5 @@ runs:
       shell: bash
       run: |
         python -c "import sys; print(sys.version)"
-        sudo -H python -m pip install scons --break-system-packages
-        scons --version
+        #sudo -H python -m pip install scons --break-system-packages
+        #scons --version
