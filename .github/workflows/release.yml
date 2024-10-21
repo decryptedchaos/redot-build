@@ -229,6 +229,8 @@ jobs:
           #sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EB8B81E14DA65431D7504EA8F63F0F2B90935439
           wget https://packages.microsoft.com/keys/microsoft.asc
           cat microsoft.asc | gpg --dearmor -o microsoft.asc.gpg
+          wget https://packages.microsoft.com/config/debian/12/prod.list
+          sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
           sudo mv microsoft.asc.gpg $(cat /etc/apt/sources.list.d/microsoft-prod.list | grep -oP "(?<=signed-by=).*(?=\])")
           sudo add-apt-repository -y "deb https://ppa.launchpadcontent.net/kisak/turtle/ubuntu focal main"
           sudo apt update && sudo apt-get install -y xvfb libc6-dev p7zip-full p7zip-rar libwayland-dev \
