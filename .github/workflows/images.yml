@@ -1,0 +1,31 @@
+name: Redot Build Release
+on:
+  workflow_dispatch:
+    inputs:
+      redot-branch:
+        description: "What branch of redot to build"
+        required: true
+        type: string
+        default: "4.3"
+      base-distro:
+        description: "What base version of fedora to use ef. F40"
+        required: true
+        type: string
+        default: "f40"
+      xcode-sdk:
+        description: "What version of Xcode to use"
+        required: true
+        type: string
+        default: "16.1"
+      osx-sdk:
+        description: "What version of the OSX SDK to use"
+        required: true
+        type: string
+        default: "14.5"
+      ios-sdk:
+        description: "What version of the IOS SDK to use"
+        required: true
+        type: string
+        default: "17.5"
+
+
