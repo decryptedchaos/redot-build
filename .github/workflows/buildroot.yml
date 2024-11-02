@@ -1,0 +1,66 @@
+name: Create Buildroots
+on: workflow_dispatch
+
+env:
+  FORCE_UNSAFE_CONFIGURE: 1
+
+jobs:
+  build:
+    name: Build Buildroots
+    runs-on: "ubuntu-latest"
+    container:
+      image: ghcr.io/trashguy/redot-buildroot:latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: x86_64
+            toolchain-prefix: x86_64-redot-linux-gnu
+            bits: 64
+          - name: aarch64
+            toolchain-prefix: aarch64-redot-linux-gnu
+            bits: 64
+          - name: i686
+            toolchain-prefix: i686-redot-linux-gnu
+            bits: 32
+          - name: armv7
+            toolchain-prefix: arm-redot-linux-gnueabihf
+            bits: 32
+
+    steps:
+      - name: Checkout Build
+        uses: actions/checkout@v4
+
+      - name: Build Buildroot
+        shell: bash
+        run: |
+          cd linux-buildroot
+
+          cp config-redot-${{ matrix.name }} .config
+
+          make clean
+          make syncconfig
+          make sdk
+
+      - name: Clean Buildroot
+        shell: bash
+        run: |
+          cd linux-buildroot
+          mkdir -p redot-toolchains
+          rm -rf redot-toolchains/${{ matrix.toolchain-prefix }}_sdk-buildroot
+          tar xf output/images/${{ matrix.toolchain-prefix }}_sdk-buildroot.tar.gz -C redot-toolchains
+
+          pushd redot-toolchains/${{ matrix.toolchain-prefix }}_sdk-buildroot
+          ../../clean-linux-toolchain.sh ${{ matrix.toolchain-prefix }} ${{ matrix.bits }}
+          popd
+
+          pushd redot-toolchains
+          tar -cjf ${{ matrix.toolchain-prefix }}_sdk-buildroot.tar.bz2 ${{ matrix.toolchain-prefix }}_sdk-buildroot
+          rm -rf ${{ matrix.toolchain-prefix }}_sdk-buildroot
+          popd
+
+      - name: Push artifact
+        uses: actions/upload-artifact@v4
+        with:
+         name: ${{ matrix.toolchain-prefix }}_sdk-buildroot
+         path: redot-toolchains/${{ matrix.toolchain-prefix }}_sdk-buildroot.tar.bz2

@@ -54,24 +54,22 @@ build_image windows
 XCODE_SDK=16.1
 OSX_SDK=14.5
 IOS_SDK=17.5
-if [ ! -e "${files_root}"/MacOSX${OSX_SDK}.sdk.tar.xz ] || [ ! -e "${files_root}"/iPhoneOS${IOS_SDK}.sdk.tar.xz ] || [ ! -e "${files_root}"/iPhoneSimulator${IOS_SDK}.sdk.tar.xz ]; then
-  if [ ! -r "${files_root}"/Xcode_${XCODE_SDK}.xip ]; then
-    echo
-    echo "Error: 'files/Xcode_${XCODE_SDK}.xip' is required for Apple platforms, but was not found or couldn't be read."
-    echo "It can be downloaded from https://developer.apple.com/download/more/ with a valid apple ID."
-    exit 1
-  fi
-
-  echo "Building OSX and iOS SDK packages. This will take a while"
-  build_image xcode
-  docker run -it --rm \
-    -v "${files_root}":/root/files
-    -e XCODE_SDKV="${XCODE_SDK}" \
-    -e OSX_SDKV="${OSX_SDK}" \
-    -e IOS_SDKV="${IOS_SDK}" \
-    redot-xcode:${img_version} \
-    2>&1 | tee logs/xcode_packer.log
+if [ ! -r "files/Xcode_${XCODE_SDK}.xip" ]; then
+  echo
+  echo "Error: 'files/Xcode_${XCODE_SDK}.xip' is required for Apple platforms, but was not found or couldn't be read."
+  echo "It can be downloaded from https://developer.apple.com/download/more/ with a valid apple ID."
+  exit 1
 fi
+
+echo "Building OSX and iOS SDK packages. This will take a while"
+build_image xcode
+docker run -it --rm \
+  -v "${files_root}":/root/files \
+  -e XCODE_SDKV="${XCODE_SDK}" \
+  -e OSX_SDKV="${OSX_SDK}" \
+  -e IOS_SDKV="${IOS_SDK}" \
+  redot-xcode:${img_version} \
+  2>&1 | tee logs/xcode_packer.log
 
 build_image osx
 build_image ios
