@@ -8,7 +8,7 @@ ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
 
 RUN dnf -y install --setopt=install_weak_deps=False \
       bash bzip2 curl file findutils gettext git make nano patch pkgconfig python3-pip unzip which xz \
-      dotnet-sdk-8.0 && \
+      dotnet-sdk-8.0 nodejs zstd  && \
     pip install scons==4.8.0
 
 CMD /bin/bash
