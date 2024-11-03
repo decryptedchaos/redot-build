@@ -1,5 +1,5 @@
-ARG img_version
-FROM redot-fedora:${img_version}
+ARG source_image
+FROM ${source_image}
 
 ENV EMSCRIPTEN_VERSION=3.1.64
 

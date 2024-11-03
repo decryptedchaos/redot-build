@@ -33,9 +33,8 @@ jobs:
 
       - name: Build Buildroot
         shell: bash
+        working-directory: ./linux-buildroot
         run: |
-          cd linux-buildroot
-
           cp config-redot-${{ matrix.name }} .config
 
           make clean
@@ -44,8 +43,8 @@ jobs:
 
       - name: Clean Buildroot
         shell: bash
+        working-directory: ./linux-buildroot
         run: |
-          cd linux-buildroot
           mkdir -p redot-toolchains
           rm -rf redot-toolchains/${{ matrix.toolchain-prefix }}_sdk-buildroot
           tar xf output/images/${{ matrix.toolchain-prefix }}_sdk-buildroot.tar.gz -C redot-toolchains
@@ -63,4 +62,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
          name: ${{ matrix.toolchain-prefix }}_sdk-buildroot
-         path: redot-toolchains/${{ matrix.toolchain-prefix }}_sdk-buildroot.tar.bz2
+         path: linux-buildroot/redot-toolchains/${{ matrix.toolchain-prefix }}_sdk-buildroot.tar.bz2
+         retention-days: 90
+         overwrite: true

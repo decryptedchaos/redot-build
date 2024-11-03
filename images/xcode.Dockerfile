@@ -1,9 +1,9 @@
-ARG img_version
-FROM redot-fedora:${img_version} as files
+ARG source_image
+FROM ${source_image} as files
 
 ADD files /root/files
 
-FROM redot-fedora:${img_version}
+FROM ${source_image}
 
 RUN dnf -y install --setopt=install_weak_deps=False \
       clang xar xar-devel xz-devel cpio && \

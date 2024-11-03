@@ -1,4 +1,5 @@
-FROM fedora:40
+ARG fedora_version
+FROM fedora:${fedora_version}
 
 WORKDIR /root
 

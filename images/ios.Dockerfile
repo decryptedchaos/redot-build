@@ -1,9 +1,10 @@
-ARG img_version
-FROM redot-fedora:${img_version} as files
+ARG source_image
+ARG osx_image
+FROM ${source_image} as files
 
 ADD files /root/files
 
-FROM redot-osx:${img_version}
+FROM ${osx_image}
 
 ENV IOS_SDK=17.5
 

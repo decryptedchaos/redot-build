@@ -1,5 +1,5 @@
-ARG img_version
-FROM redot-fedora:${img_version}
+ARG source_image
+FROM ${source_image}
 
 ENV ANDROID_SDK_ROOT=/root/sdk
 ENV ANDROID_NDK_VERSION=23.2.8568313

@@ -1,5 +1,5 @@
-ARG img_version
-FROM redot-fedora:${img_version}
+ARG source_image
+FROM ${source_image}
 
 ENV GODOT_SDK_LINUX_X86_64=/root/x86_64-godot-linux-gnu_sdk-buildroot
 ENV GODOT_SDK_LINUX_X86_32=/root/i686-godot-linux-gnu_sdk-buildroot
