@@ -1,0 +1,75 @@
+name: Build Web
+description: Build Web
+runs:
+  using: "composite"
+  steps:
+    - name: Build Macos
+      working-directory: redot-engine
+      shell: bash
+      run: |
+        declare -a JOBS=(
+          "target=template_debug"
+          "target=template_release"
+          "target=template_debug dlink_enabled=yes"
+          "target=template_release dlink_enabled=yes"
+        )
+        declare -a JOBS_NOTHREADS=(
+          "target=template_debug threads=no"
+          "target=template_release threads=no"
+          "target=template_debug dlink_enabled=yes threads=no"
+          "target=template_release dlink_enabled=yes threads=no"
+        )
+        
+        source /root/emsdk/emsdk_env.sh
+        
+        echo "Starting classical build for Web..."
+        
+        for i in {0..3}; do
+          cp -r godot godot$i
+          cd godot$i
+          echo "$SCONS platform=web ${OPTIONS} ${JOBS[$i]}"
+          $SCONS platform=web ${OPTIONS} ${JOBS[$i]} &
+          pids[$i]=$!
+        done
+      
+        cd godot
+        echo "$SCONS platform=web ${OPTIONS} target=editor use_closure_compiler=yes"
+        $SCONS platform=web ${OPTIONS} target=editor use_closure_compiler=yes &
+        pid_editor=$!
+      
+        for pid in ${pids[*]}; do
+          wait $pid
+        done
+        wait $pid_editor
+      
+        for i in {0..3}; do
+          cp -r godot godot-nothreads$i
+          cd godot-nothreads$i
+          echo "$SCONS platform=web ${OPTIONS} ${JOBS_NOTHREADS[$i]}"
+          $SCONS platform=web ${OPTIONS} ${JOBS_NOTHREADS[$i]} &
+          pids_nothreads[$i]=$!
+        done
+      
+        for pid in ${pids_nothreads[*]}; do
+          wait $pid
+        done
+      
+        mkdir -p out/web/tools
+        cp -rvp godot/bin/*.editor*.zip out/web/tools
+      
+        mkdir -p out/web/templates
+        for i in {0..3}; do
+          cp -rvp godot$i/bin/*.zip out/web/templates
+          cp -rvp godot-nothreads$i/bin/*.zip out/web/templates
+        done
+        
+        echo "Starting Mono build for Web..."
+      
+        cp -r mono-glue/GodotSharp/GodotSharp/Generated modules/mono/glue/GodotSharp/GodotSharp/
+      
+        $SCONS platform=web ${OPTIONS} ${OPTIONS_MONO} target=template_debug
+        $SCONS platform=web ${OPTIONS} ${OPTIONS_MONO} target=template_release
+      
+        mkdir -p out/web/templates-mono
+        cp -rvp bin/*.zip out/web/templates-mono
+        rm -f bin/*.zip

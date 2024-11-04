@@ -36,6 +36,7 @@ on:
 # TODO move mono builds to Redot ones
 env:
   REDOT_BASE_VERSION_STATUS: stable
+  REDOT_BASENAME: Redot_v${{ github.event.inputs.version }}
   REDOT_VERSION_STATUS: custom
   REDOT_MONO_BUILD_TAG: release-4912f62 # mono-6.12.0.198
   REDOT_MONO_BUILD_REPO: godotengine/godot-mono-builds
@@ -51,7 +52,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Create source cache
+        id: source-cache
+        uses: actions/cache@v4
+        with:
+          path: redot-engine
+          key: redot-engine-${{env.REDOT_BASE_VERSION}}
+          restore-keys: |
+            redot-engine-${{env.REDOT_BASE_VERSION}}
+
       - name: Checkout Redot source
+        if: steps.source-cache.outputs.cache-hit != 'true'
         uses: actions/checkout@v4
         with:
           repository: Redot-Engine/redot-engine
@@ -60,11 +71,13 @@ jobs:
           path: redot-engine
 
       - name: Setup deps
+        if: steps.source-cache.outputs.cache-hit != 'true'
         uses: ./.github/actions/build-deps
         with:
           working: "redot-engine"
 
       - name: Validate and Tarball
+        if: steps.source-cache.outputs.cache-hit != 'true'
         working-directory: redot-engine
         shell: bash
         run: |
@@ -79,41 +92,38 @@ jobs:
           sh misc/scripts/make_tarball.sh -v ${{ github.event.inputs.version }}
           cp ../redot-${{ github.event.inputs.version }}.tar.gz .
 
-      - name: Cache Build
-        uses: actions/cache@v4
-        with:
-          path: redot-engine
-          key: tarball
 
   mono-glue:
     needs: tarball
     runs-on: "ubuntu-latest"
     container:
       image: ghcr.io/trashguy/redot-linux:${{ github.event.inputs.container-tag }}
-    defaults:
-      run:
-        working-directory: redot-engine
     env:
-      SCONS: scons verbose=yes warnings=no progress=no
+      SCONS: scons  verbose=yes warnings=no progress=no
       OPTIONS: debug_symbols=no use_static_cpp=no
-      PATH: ${GODOT_SDK_LINUX_X86_64}/bin:${BASE_PATH}"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cache Restore
-        uses: actions/cache@v4
+      - name: Get source cache
+        uses: actions/cache/restore@v4
         with:
           path: redot-engine
-          key: tarball
+          key: redot-engine-${{env.REDOT_BASE_VERSION}}
+          restore-keys: |
+            redot-engine-${{env.REDOT_BASE_VERSION}}
 
-      - name: Setup Redot build cache
-        uses: ./.github/actions/redot-cache
+      - name: Mono cache
+        uses: actions/cache@v4
+        id: mono-cache
         with:
-          cache-name: ${{ matrix.cache-name }}
-        continue-on-error: true
+          path: redot-engine/mono-glue
+          key: redot-engine-mono-${{env.REDOT_BASE_VERSION}}
+          restore-keys: |
+            redot-engine-mono-${{env.REDOT_BASE_VERSION}}
 
       - name: Build mono glue
+        if: steps.mono-cache.outputs.cache-hit != 'true'
         shell: bash
         working-directory: redot-engine
         run: |
@@ -124,39 +134,62 @@ jobs:
           bin/redot.linuxbsd.editor.x86_64.mono --headless --generate-mono-glue mono-glue
 
   linux:
+    name: Linux ${{ matrix.name }}
     needs: mono-glue
     runs-on: "ubuntu-latest"
     container:
       image: ghcr.io/trashguy/redot-linux:${{ github.event.inputs.container-tag }}
-    defaults:
-      run:
-        working-directory: redot-engine
-    name: Linux ${{ matrix.name }}
     env:
-      SCONSFLAGS: mono_static=yes
+      SCONS: scons  verbose=yes warnings=no progress=no
+      OPTIONS: production=yes
+      OPTIONS_MONO: module_mono_enabled=yes
     strategy:
       fail-fast: false
       matrix:
         include:
           - name: Editor & Templates
             cache-name: linux
-            bin: ./redot-engine/bin/redot.linuxbsd.editor.x86_64
             build-mono: false
 
-          - name: Editor & Templates w/ Mono
-            cache-name: linux-mono
-            bin: ./redot-engine/bin/redot.linuxbsd.editor.x86_64.mono
-            build-mono: true
 
     steps:
-      - name: Cache Build
-        uses: actions/cache@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get source cache
+        uses: actions/cache/restore@v4
         with:
           path: redot-engine
-          key: tarball
+          key: redot-engine-${{env.REDOT_BASE_VERSION}}
+          restore-keys: |
+            redot-engine-${{env.REDOT_BASE_VERSION}}
+
+      - name: Mono cache
+        uses: actions/cache/restore@v4
+        with:
+          path: redot-engine/mono-glue
+          key: redot-engine-mono-${{env.REDOT_BASE_VERSION}}
+          restore-keys: |
+            redot-engine-mono-${{env.REDOT_BASE_VERSION}}
 
       - name: Setup Redot build cache
-        uses: ./.github/actions/redot-cache
+        uses: ./.github/actions/scons-cache
         with:
           cache-name: ${{ matrix.cache-name }}
         continue-on-error: true
+
+      - name: Build Linux Editor and Templates
+        uses: ./.github/actions/build-linux
+        with:
+          mono: ${{ matrix.build-mono }}
+
+  build-release-linux:
+    name: Build Release Linux
+    needs: linux
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Linux Release
+        uses: ./.github/actions/build-release-linux

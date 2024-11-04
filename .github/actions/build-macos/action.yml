@@ -1,0 +1,68 @@
+name: Build Macos
+description: Build Macos
+inputs:
+  mono:
+    description: Build with mono
+    type: bool
+    default: false
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Build Macos
+      if: inputs.mono != true
+      working-directory: redot-engine
+      shell: bash
+      run: |
+        echo "Starting classical build for macOS..."
+      
+        $SCONS platform=macos $OPTIONS arch=x86_64 target=editor
+        $SCONS platform=macos $OPTIONS arch=arm64 target=editor
+        ls -lash bin
+        lipo -create bin/redot.macos.editor.x86_64 bin/redot.macos.editor.arm64 -output bin/redot.macos.editor.universal
+      
+        mkdir -p out/macos/tools
+        cp -rvp bin/* out/macos/tools
+        rm -rf bin
+      
+        $SCONS platform=macos $OPTIONS arch=x86_64 target=template_debug
+        $SCONS platform=macos $OPTIONS arch=arm64 target=template_debug
+        lipo -create bin/redot.macos.template_debug.x86_64 bin/redot.macos.template_debug.arm64 -output bin/redot.macos.template_debug.universal
+        $SCONS platform=macos $OPTIONS arch=x86_64 target=template_release
+        $SCONS platform=macos $OPTIONS arch=arm64 target=template_release
+        lipo -create bin/redot.macos.template_release.x86_64 bin/redot.macos.template_release.arm64 -output bin/redot.macos.template_release.universal
+      
+        mkdir -p out/macos/templates
+        cp -rvp bin/* out/macos/templates
+        rm -rf bin
+  
+    - name: Build Windows Mono
+      if: inputs.mono != false
+      working-directory: redot-engine
+      shell: bash
+      run: |
+        echo "Starting Mono build for macOS..."
+      
+        cp -r /root/mono-glue/GodotSharp/GodotSharp/Generated modules/mono/glue/GodotSharp/GodotSharp/
+        cp -r /root/mono-glue/GodotSharp/GodotSharpEditor/Generated modules/mono/glue/GodotSharp/GodotSharpEditor/
+      
+        $SCONS platform=macos $OPTIONS $OPTIONS_MONO arch=x86_64 target=editor
+        $SCONS platform=macos $OPTIONS $OPTIONS_MONO arch=arm64 target=editor
+        lipo -create bin/redot.macos.editor.x86_64.mono bin/redot.macos.editor.arm64.mono -output bin/redot.macos.editor.universal.mono
+        ./modules/mono/build_scripts/build_assemblies.py --godot-output-dir=./bin --godot-platform=macos
+      
+        mkdir -p out/macos/tools-mono
+        cp -rvp bin/* out/macos/tools-mono
+        rm -rf bin
+      
+        $SCONS platform=macos $OPTIONS $OPTIONS_MONO arch=x86_64 target=template_debug
+        $SCONS platform=macos $OPTIONS $OPTIONS_MONO arch=arm64 target=template_debug
+        lipo -create bin/redot.macos.template_debug.x86_64.mono bin/redot.macos.template_debug.arm64.mono -output bin/redot.macos.template_debug.universal.mono
+        $SCONS platform=macos $OPTIONS $OPTIONS_MONO arch=x86_64 target=template_release
+        $SCONS platform=macos $OPTIONS $OPTIONS_MONO arch=arm64 target=template_release
+        lipo -create bin/redot.macos.template_release.x86_64.mono bin/redot.macos.template_release.arm64.mono -output bin/redot.macos.template_release.universal.mono
+      
+        mkdir -p out/macos/templates-mono
+        cp -rvp bin/* out/macos/templates-mono
+        rm -rf bin
+   

@@ -1,0 +1,150 @@
+name: Build Release Windows
+description: Build Release Windows
+runs:
+  using: "composite"
+  steps:
+    - name: Get source cache
+      uses: actions/cache/restore@v4
+      with:
+        path: redot-engine
+        key: redot-engine-${{env.REDOT_BASE_VERSION}}-${{github.ref}}-${{github.sha}}
+        restore-keys: |
+          redot-engine-${{env.REDOT_BASE_VERSION}}-${{github.ref}}-${{github.sha}}
+          redot-engine-${{env.REDOT_BASE_VERSION}}-${{github.ref}}
+          redot-engine-${{env.REDOT_BASE_VERSION}}
+
+    - name: Out cache windows
+      uses: actions/cache@v4
+      with:
+        path: redot-engine/out/windows
+        key: out-windows${{env.REDOT_BASE_VERSION}}-${{github.ref}}-${{github.sha}}
+        restore-keys: |
+          out-windows-${{env.REDOT_BASE_VERSION}}-${{github.ref}}-${{github.sha}}
+          out-windows-${{env.REDOT_BASE_VERSION}}-${{github.ref}}
+          out-windows-${{env.REDOT_BASE_VERSION}}
+
+    - name: Get templates cache
+      uses: actions/cache/restore@v4
+      with:
+        path: templates
+        key: templates-${{env.REDOT_BASE_VERSION}}-${{github.ref}}-${{github.sha}}
+        restore-keys: |
+          templates-${{env.REDOT_BASE_VERSION}}-${{github.ref}}-${{github.sha}}
+          templates-${{env.REDOT_BASE_VERSION}}-${{github.ref}}
+          templates-${{env.REDOT_BASE_VERSION}}
+
+    - name: Build release Artifacts
+      working-directory: redot-engine
+      shell: bash
+      run: |
+        mkdir -p templates/mono
+        mkdir -p release/mono
+        ## Windows (Classical) ##
+      
+        # Editor
+        binname="${{ env.REDOT_BASENAME }}_win64.exe"
+        wrpname="${{ env.REDOT_BASENAME }}_win64_console.exe"
+        cp out/windows/x86_64/tools/redot.windows.editor.x86_64.exe ${binname}
+        #sign_windows ${binname}
+        cp out/windows/x86_64/tools/redot.windows.editor.x86_64.console.exe ${wrpname}
+        #sign_windows ${wrpname}
+        zip -q -9 "release/${binname}.zip" ${binname} ${wrpname}
+        rm ${binname} ${wrpname}
+      
+        binname="${{ env.REDOT_BASENAME }}_win32.exe"
+        wrpname="${{ env.REDOT_BASENAME }}_win32_console.exe"
+        cp out/windows/x86_32/tools/redot.windows.editor.x86_32.exe ${binname}
+        #sign_windows ${binname}
+        cp out/windows/x86_32/tools/redot.windows.editor.x86_32.console.exe ${wrpname}
+        #sign_windows ${wrpname}
+        zip -q -9 "release/${binname}.zip" ${binname} ${wrpname}
+        rm ${binname} ${wrpname}
+      
+        binname="${{ env.REDOT_BASENAME }}_windows_arm64.exe"
+        wrpname="${{ env.REDOT_BASENAME }}_windows_arm64_console.exe"
+        cp out/windows/arm64/tools/redot.windows.editor.arm64.llvm.exe ${binname}
+        #sign_windows ${binname}
+        cp out/windows/arm64/tools/redot.windows.editor.arm64.llvm.console.exe ${wrpname}
+        #sign_windows ${wrpname}
+        zip -q -9 "release/${binname}.zip" ${binname} ${wrpname}
+        rm ${binname} ${wrpname}
+      
+        # Templates
+        cp out/windows/x86_64/templates/redot.windows.template_release.x86_64.exe templates/windows_release_x86_64.exe
+        cp out/windows/x86_64/templates/redot.windows.template_debug.x86_64.exe templates/windows_debug_x86_64.exe
+        cp out/windows/x86_32/templates/redot.windows.template_release.x86_32.exe templates/windows_release_x86_32.exe
+        cp out/windows/x86_32/templates/redot.windows.template_debug.x86_32.exe templates/windows_debug_x86_32.exe
+        cp out/windows/arm64/templates/redot.windows.template_release.arm64.llvm.exe templates/windows_release_arm64.exe
+        cp out/windows/arm64/templates/redot.windows.template_debug.arm64.llvm.exe templates/windows_debug_arm64.exe
+        cp out/windows/x86_64/templates/redot.windows.template_release.x86_64.console.exe templates/windows_release_x86_64_console.exe
+        cp out/windows/x86_64/templates/redot.windows.template_debug.x86_64.console.exe templates/windows_debug_x86_64_console.exe
+        cp out/windows/x86_32/templates/redot.windows.template_release.x86_32.console.exe templates/windows_release_x86_32_console.exe
+        cp out/windows/x86_32/templates/redot.windows.template_debug.x86_32.console.exe templates/windows_debug_x86_32_console.exe
+        cp out/windows/arm64/templates/redot.windows.template_release.arm64.llvm.console.exe templates/windows_release_arm64_console.exe
+        cp out/windows/arm64/templates/redot.windows.template_debug.arm64.llvm.console.exe templates/windows_debug_arm64_console.exe
+
+        ## Windows (Mono) ##
+      
+        # Editor
+        binname="${{ env.REDOT_BASENAME }}_mono_win64"
+        wrpname="${{ env.REDOT_BASENAME }}_mono_win64_console"
+        mkdir -p ${binname}
+        cp out/windows/x86_64/tools-mono/redot.windows.editor.x86_64.mono.exe ${binname}/${binname}.exe
+        #sign_windows ${binname}/${binname}.exe
+        cp -rp out/windows/x86_64/tools-mono/GodotSharp ${binname}/
+        cp out/windows/x86_64/tools-mono/redot.windows.editor.x86_64.mono.console.exe ${binname}/${wrpname}.exe
+        #sign_windows ${binname}/${wrpname}.exe
+        zip -r -q -9 "release/mono/${binname}.zip" ${binname}
+        rm -rf ${binname}
+      
+        binname="${{ env.REDOT_BASENAME }}_mono_win32"
+        wrpname="${{ env.REDOT_BASENAME }}_mono_win32_console"
+        mkdir -p ${binname}
+        cp out/windows/x86_32/tools-mono/redot.windows.editor.x86_32.mono.exe ${binname}/${binname}.exe
+        #sign_windows ${binname}/${binname}.exe
+        cp -rp out/windows/x86_32/tools-mono/GodotSharp ${binname}/
+        cp out/windows/x86_32/tools-mono/redot.windows.editor.x86_32.mono.console.exe ${binname}/${wrpname}.exe
+        #sign_windows ${binname}/${wrpname}.exe
+        zip -r -q -9 "release/mono/${binname}.zip" ${binname}
+        rm -rf ${binname}
+      
+        binname="${{ env.REDOT_BASENAME }}_mono_windows_arm64"
+        wrpname="${{ env.REDOT_BASENAME }}_mono_windows_arm64_console"
+        mkdir -p ${binname}
+        cp out/windows/arm64/tools-mono/redot.windows.editor.arm64.llvm.mono.exe ${binname}/${binname}.exe
+        #sign_windows ${binname}/${binname}.exe
+        cp -rp out/windows/arm64/tools-mono/GodotSharp ${binname}/
+        cp out/windows/arm64/tools-mono/redot.windows.editor.arm64.llvm.mono.console.exe ${binname}/${wrpname}.exe
+        #sign_windows ${binname}/${wrpname}.exe
+        zip -r -q -9 "release/mono/${binname}.zip" ${binname}
+        rm -rf ${binname}
+      
+        # Templates
+        cp out/windows/x86_64/templates-mono/redot.windows.template_debug.x86_64.mono.exe templates/mono/windows_debug_x86_64.exe
+        cp out/windows/x86_64/templates-mono/redot.windows.template_release.x86_64.mono.exe templates/mono/windows_release_x86_64.exe
+        cp out/windows/x86_32/templates-mono/redot.windows.template_debug.x86_32.mono.exe templates/mono/windows_debug_x86_32.exe
+        cp out/windows/x86_32/templates-mono/redot.windows.template_release.x86_32.mono.exe templates/mono/windows_release_x86_32.exe
+        cp out/windows/arm64/templates-mono/redot.windows.template_debug.arm64.llvm.mono.exe templates/mono/windows_debug_arm64.exe
+        cp out/windows/arm64/templates-mono/redot.windows.template_release.arm64.llvm.mono.exe templates/mono/windows_release_arm64.exe
+        cp out/windows/x86_64/templates-mono/redot.windows.template_debug.x86_64.mono.console.exe templates/mono/windows_debug_x86_64_console.exe
+        cp out/windows/x86_64/templates-mono/redot.windows.template_release.x86_64.mono.console.exe templates/mono/windows_release_x86_64_console.exe
+        cp out/windows/x86_32/templates-mono/redot.windows.template_debug.x86_32.mono.console.exe templates/mono/windows_debug_x86_32_console.exe
+        cp out/windows/x86_32/templates-mono/redot.windows.template_release.x86_32.mono.console.exe templates/mono/windows_release_x86_32_console.exe
+        cp out/windows/arm64/templates-mono/redot.windows.template_debug.arm64.llvm.mono.console.exe templates/mono/windows_debug_arm64_console.exe
+        cp out/windows/arm64/templates-mono/redot.windows.template_release.arm64.llvm.mono.console.exe templates/mono/windows_release_arm64_console.exe
+        
+    - name: Update templates cache
+      uses: actions/cache/save@v4
+      with:
+        path: templates
+        key: templates-${{env.REDOT_BASE_VERSION}}-${{github.ref}}-${{github.sha}}
+        restore-keys: |
+          templates-${{env.REDOT_BASE_VERSION}}-${{github.ref}}-${{github.sha}}
+          templates-${{env.REDOT_BASE_VERSION}}-${{github.ref}}
+          templates-${{env.REDOT_BASE_VERSION}}
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: Release Windows Bins
+        path: release
+        retention-days: 30

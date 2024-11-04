@@ -1,0 +1,144 @@
+name: Build Linux
+description: Build linux
+inputs:
+  mono:
+    description: Build with mono
+    type: bool
+    default: false
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Out cache linux
+      uses: actions/cache@v4
+      id: out-cache
+      with:
+        path: redot-engine/out/linux
+        key: out-linux${{env.REDOT_BASE_VERSION}}
+        restore-keys: |
+          out-linux-${{env.REDOT_BASE_VERSION}}
+
+    - name: Build Linux
+      if: inputs.mono != true && steps.out-cache.outputs.cache-hit != 'true'
+      working-directory: redot-engine
+      shell: bash
+      run: |
+        echo "Starting classical build for Linux..."
+
+        export PATH="${GODOT_SDK_LINUX_X86_64}/bin:${BASE_PATH}"
+
+        $SCONS platform=linuxbsd arch=x86_64 $OPTIONS target=editor
+        mkdir -p out/linux/x86_64/tools
+        cp -rvp bin/* out/linux/x86_64/tools
+        rm -rf bin
+
+        $SCONS platform=linuxbsd arch=x86_64 $OPTIONS target=template_debug
+        $SCONS platform=linuxbsd arch=x86_64 $OPTIONS target=template_release
+        mkdir -p out/linux/x86_64/templates
+        cp -rvp bin/* out/linux/x86_64/templates
+        rm -rf bin
+
+        export PATH="${GODOT_SDK_LINUX_X86_32}/bin:${BASE_PATH}"
+
+        $SCONS platform=linuxbsd arch=x86_32 $OPTIONS target=editor
+        mkdir -p out/linux/x86_32/tools
+        cp -rvp bin/* out/linux/x86_32/tools
+        rm -rf bin
+
+        $SCONS platform=linuxbsd arch=x86_32 $OPTIONS target=template_debug
+        $SCONS platform=linuxbsd arch=x86_32 $OPTIONS target=template_release
+        mkdir -p out/linux/x86_32/templates
+        cp -rvp bin/* out/linux/x86_32/templates
+        rm -rf bin
+
+        export PATH="${GODOT_SDK_LINUX_ARM64}/bin:${BASE_PATH}"
+
+        $SCONS platform=linuxbsd arch=arm64 $OPTIONS target=editor
+        mkdir -p out/linux/arm64/tools
+        cp -rvp bin/* out/linux/arm64/tools
+        rm -rf bin
+
+        $SCONS platform=linuxbsd arch=arm64 $OPTIONS target=template_debug
+        $SCONS platform=linuxbsd arch=arm64 $OPTIONS target=template_release
+        mkdir -p out/linux/arm64/templates
+        cp -rvp bin/* out/linux/arm64/templates
+        rm -rf bin
+
+        export PATH="${GODOT_SDK_LINUX_ARM32}/bin:${BASE_PATH}"
+
+        $SCONS platform=linuxbsd arch=arm32 $OPTIONS target=editor
+        mkdir -p out/linux/arm32/tools
+        cp -rvp bin/* out/linux/arm32/tools
+        rm -rf bin
+
+        $SCONS platform=linuxbsd arch=arm32 $OPTIONS target=template_debug
+        $SCONS platform=linuxbsd arch=arm32 $OPTIONS target=template_release
+        mkdir -p out/linux/arm32/templates
+        cp -rvp bin/* out/linux/arm32/templates
+        rm -rf bin
+
+    - name: Build Linux Mono
+      if: inputs.mono != false  && steps.out-cache.outputs.cache-hit != 'true'
+      working-directory: redot-engine
+      shell: bash
+      run: |
+        echo "Starting Mono build for Linux..."
+
+        cp -r mono-glue/GodotSharp/GodotSharp/Generated modules/mono/glue/GodotSharp/GodotSharp/
+        cp -r mono-glue/GodotSharp/GodotSharpEditor/Generated modules/mono/glue/GodotSharp/GodotSharpEditor/
+
+        export PATH="${GODOT_SDK_LINUX_X86_64}/bin:${BASE_PATH}"
+
+        $SCONS platform=linuxbsd arch=x86_64 $OPTIONS $OPTIONS_MONO target=editor
+        ./modules/mono/build_scripts/build_assemblies.py --godot-output-dir=./bin --godot-platform=linuxbsd
+        mkdir -p out/linux/x86_64/tools-mono
+        cp -rvp bin/* out/linux/x86_64/tools-mono
+        rm -rf bin
+
+        $SCONS platform=linuxbsd arch=x86_64 $OPTIONS $OPTIONS_MONO target=template_debug
+        $SCONS platform=linuxbsd arch=x86_64 $OPTIONS $OPTIONS_MONO target=template_release
+        mkdir -p out/linux/x86_64/templates-mono
+        cp -rvp bin/* out/linux/x86_64/templates-mono
+        rm -rf bin
+
+        export PATH="${GODOT_SDK_LINUX_X86_32}/bin:${BASE_PATH}"
+
+        $SCONS platform=linuxbsd arch=x86_32 $OPTIONS $OPTIONS_MONO target=editor
+        ./modules/mono/build_scripts/build_assemblies.py --godot-output-dir=./bin --godot-platform=linuxbsd
+        mkdir -p out/linux/x86_32/tools-mono
+        cp -rvp bin/* out/linux/x86_32/tools-mono
+        rm -rf bin
+
+        $SCONS platform=linuxbsd arch=x86_32 $OPTIONS $OPTIONS_MONO target=template_debug
+        $SCONS platform=linuxbsd arch=x86_32 $OPTIONS $OPTIONS_MONO target=template_release
+        mkdir -p out/linux/x86_32/templates-mono
+        cp -rvp bin/* out/linux/x86_32/templates-mono
+        rm -rf bin
+
+        export PATH="${GODOT_SDK_LINUX_ARM64}/bin:${BASE_PATH}"
+
+        $SCONS platform=linuxbsd arch=arm64 $OPTIONS $OPTIONS_MONO target=editor
+        ./modules/mono/build_scripts/build_assemblies.py --godot-output-dir=./bin --godot-platform=linuxbsd
+        mkdir -p out/linux/arm64/tools-mono
+        cp -rvp bin/* out/linux/arm64/tools-mono
+        rm -rf bin
+
+        $SCONS platform=linuxbsd arch=arm64 $OPTIONS $OPTIONS_MONO target=template_debug
+        $SCONS platform=linuxbsd arch=arm64 $OPTIONS $OPTIONS_MONO target=template_release
+        mkdir -p out/linux/arm64/templates-mono
+        cp -rvp bin/* out/linux/arm64/templates-mono
+        rm -rf bin
+
+        export PATH="${GODOT_SDK_LINUX_ARM32}/bin:${BASE_PATH}"
+
+        $SCONS platform=linuxbsd arch=arm32 $OPTIONS $OPTIONS_MONO target=editor
+        ./modules/mono/build_scripts/build_assemblies.py --godot-output-dir=./bin --godot-platform=linuxbsd
+        mkdir -p out/linux/arm32/tools-mono
+        cp -rvp bin/* out/linux/arm32/tools-mono
+        rm -rf bin
+
+        $SCONS platform=linuxbsd arch=arm32 $OPTIONS $OPTIONS_MONO target=template_debug
+        $SCONS platform=linuxbsd arch=arm32 $OPTIONS $OPTIONS_MONO target=template_release
+        mkdir -p out/linux/arm32/templates-mono
+        cp -rvp bin/* out/linux/arm32/templates-mono
+        rm -rf bin
