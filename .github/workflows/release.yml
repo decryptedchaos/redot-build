@@ -36,6 +36,7 @@ on:
 # TODO move mono builds to Redot ones
 env:
   REDOT_BASE_VERSION_STATUS: stable
+  REDOT_BASE_VERSION: ${{ github.event.inputs.version }}
   REDOT_BASENAME: Redot_v${{ github.event.inputs.version }}
   REDOT_VERSION_STATUS: custom
   REDOT_MONO_BUILD_TAG: release-4912f62 # mono-6.12.0.198
@@ -45,7 +46,7 @@ env:
 
 jobs:
   tarball:
-    runs-on: "ubuntu-latest"
+    runs-on: [self-hosted]
     env:
       REDOT_VERSION: ${{ github.event.inputs.version }}
     steps:
@@ -95,7 +96,7 @@ jobs:
 
   mono-glue:
     needs: tarball
-    runs-on: "ubuntu-latest"
+    runs-on: [self-hosted]
     container:
       image: ghcr.io/trashguy/redot-linux:${{ github.event.inputs.container-tag }}
     env:
@@ -136,7 +137,7 @@ jobs:
   linux:
     name: Linux ${{ matrix.name }}
     needs: mono-glue
-    runs-on: "ubuntu-latest"
+    runs-on: [self-hosted]
     container:
       image: ghcr.io/trashguy/redot-linux:${{ github.event.inputs.container-tag }}
     env:
@@ -145,12 +146,15 @@ jobs:
       OPTIONS_MONO: module_mono_enabled=yes
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         include:
           - name: Editor & Templates
             cache-name: linux
             build-mono: false
-
+          - name: Editor & Templates w/ Mono
+            cache-name: linux-mono
+            build-mono: true
 
     steps:
       - name: Checkout repository
