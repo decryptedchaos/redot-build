@@ -3,6 +3,15 @@ description: Build Web
 runs:
   using: "composite"
   steps:
+    - name: Out cache Web
+      uses: actions/cache@v4
+      id: out-cache
+      with:
+        path: redot-engine/out/web
+        key: out-web-${{env.REDOT_BASE_VERSION}}
+        restore-keys: |
+          out-web-${{env.REDOT_BASE_VERSION}}
+
     - name: Build Macos
       working-directory: redot-engine
       shell: bash

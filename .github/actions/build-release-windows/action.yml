@@ -7,30 +7,24 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: redot-engine
-        key: redot-engine-${{env.REDOT_BASE_VERSION}}-${{github.ref}}-${{github.sha}}
+        key: redot-engine-${{env.REDOT_BASE_VERSION}}
         restore-keys: |
-          redot-engine-${{env.REDOT_BASE_VERSION}}-${{github.ref}}-${{github.sha}}
-          redot-engine-${{env.REDOT_BASE_VERSION}}-${{github.ref}}
           redot-engine-${{env.REDOT_BASE_VERSION}}
 
-    - name: Out cache windows
+    - name: Out cache Windows
       uses: actions/cache@v4
       with:
         path: redot-engine/out/windows
-        key: out-windows${{env.REDOT_BASE_VERSION}}-${{github.ref}}-${{github.sha}}
+        key: out-windows-{{env.REDOT_BASE_VERSION}}
         restore-keys: |
-          out-windows-${{env.REDOT_BASE_VERSION}}-${{github.ref}}-${{github.sha}}
-          out-windows-${{env.REDOT_BASE_VERSION}}-${{github.ref}}
           out-windows-${{env.REDOT_BASE_VERSION}}
 
     - name: Get templates cache
       uses: actions/cache/restore@v4
       with:
         path: templates
-        key: templates-${{env.REDOT_BASE_VERSION}}-${{github.ref}}-${{github.sha}}
+        key: templates-${{env.REDOT_BASE_VERSION}}
         restore-keys: |
-          templates-${{env.REDOT_BASE_VERSION}}-${{github.ref}}-${{github.sha}}
-          templates-${{env.REDOT_BASE_VERSION}}-${{github.ref}}
           templates-${{env.REDOT_BASE_VERSION}}
 
     - name: Build release Artifacts
@@ -137,14 +131,12 @@ runs:
       uses: actions/cache/save@v4
       with:
         path: templates
-        key: templates-${{env.REDOT_BASE_VERSION}}-${{github.ref}}-${{github.sha}}
+        key: templates-${{env.REDOT_BASE_VERSION}}
         restore-keys: |
-          templates-${{env.REDOT_BASE_VERSION}}-${{github.ref}}-${{github.sha}}
-          templates-${{env.REDOT_BASE_VERSION}}-${{github.ref}}
           templates-${{env.REDOT_BASE_VERSION}}
 
     - uses: actions/upload-artifact@v4
       with:
         name: Release Windows Bins
-        path: release
+        path: release/${{env.REDOT_BASE_VERSION}}/**/*
         retention-days: 30

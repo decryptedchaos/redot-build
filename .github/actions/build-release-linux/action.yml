@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: redot-engine/out/linux
-        key: out-linux${{env.REDOT_BASE_VERSION}}
+        key: out-linux-${{env.REDOT_BASE_VERSION}}
         restore-keys: |
           out-linux-${{env.REDOT_BASE_VERSION}}
 
@@ -118,5 +118,6 @@ runs:
     - uses: actions/upload-artifact@v4
       with:
         name: Release Linux Bins
-        path: release
+        path: release/${{env.REDOT_BASE_VERSION}}/**/*
         retention-days: 30
+

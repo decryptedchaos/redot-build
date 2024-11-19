@@ -9,6 +9,15 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Out cache Macos
+      uses: actions/cache@v4
+      id: out-cache
+      with:
+        path: redot-engine/out/macos
+        key: out-macos-{{env.REDOT_BASE_VERSION}}
+        restore-keys: |
+          out-macos-${{env.REDOT_BASE_VERSION}}
+
     - name: Build Macos
       if: inputs.mono != true
       working-directory: redot-engine
@@ -36,7 +45,7 @@ runs:
         cp -rvp bin/* out/macos/templates
         rm -rf bin
   
-    - name: Build Windows Mono
+    - name: Build Macos Mono
       if: inputs.mono != false
       working-directory: redot-engine
       shell: bash

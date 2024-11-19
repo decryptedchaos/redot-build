@@ -1,0 +1,73 @@
+name: Build Release Linux
+description: Build Release linux
+runs:
+  using: "composite"
+  steps:
+    - name: Get source cache
+      uses: actions/cache/restore@v4
+      with:
+        path: redot-engine
+        key: redot-engine-${{env.REDOT_BASE_VERSION}}
+        restore-keys: |
+          redot-engine-${{env.REDOT_BASE_VERSION}}
+
+    - name: Out cache linux
+      uses: actions/cache@v4
+      with:
+        path: redot-engine/out/linux
+        key: out-web-{{env.REDOT_BASE_VERSION}}
+        restore-keys: |
+          out-web-${{env.REDOT_BASE_VERSION}}
+
+    - name: Get templates cache
+      uses: actions/cache/restore@v4
+      with:
+        path: templates
+        key: templates-${{env.REDOT_BASE_VERSION}}
+        restore-keys: |
+          templates-${{env.REDOT_BASE_VERSION}}
+
+    - name: Build release Artifacts
+      working-directory: redot-engine
+      shell: bash
+      run: |
+        mkdir -p templates/mono
+        mkdir -p release/mono
+        mkdir -p web
+
+        # Editor
+        unzip out/web/tools/redot.web.editor.wasm32.zip -d web/
+        brotli --keep --force --quality=11 web/*
+        binname="${{ env.REDOT_BASENAME }}_web_editor.zip"
+        cp out/web/tools/redot.web.editor.wasm32.zip release/${binname}
+
+        # Templates
+        cp out/web/templates/redot.web.template_release.wasm32.zip templates/web_release.zip
+        cp out/web/templates/redot.web.template_debug.wasm32.zip templates/web_debug.zip
+
+        cp out/web/templates/redot.web.template_release.wasm32.nothreads.zip templates/web_nothreads_release.zip
+        cp out/web/templates/redot.web.template_debug.wasm32.nothreads.zip templates/web_nothreads_debug.zip
+
+        cp out/web/templates/redot.web.template_release.wasm32.dlink.zip templates/web_dlink_release.zip
+        cp out/web/templates/redot.web.template_debug.wasm32.dlink.zip templates/web_dlink_debug.zip
+
+        cp out/web/templates/redot.web.template_release.wasm32.nothreads.dlink.zip templates/web_dlink_nothreads_release.zip
+        cp out/web/templates/redot.web.template_debug.wasm32.nothreads.dlink.zip templates/web_dlink_nothreads_debug.zip
+
+        cp out/web/templates-mono/redot.web.template_debug.wasm32.mono.zip templates/web_debug.zip
+        cp out/web/templates-mono/redot.web.template_release.wasm32.mono.zip templates/web_release.zip
+
+    - name: Update templates cache
+      uses: actions/cache/save@v4
+      with:
+        path: templates
+        key: templates-${{env.REDOT_BASE_VERSION}}
+        restore-keys: |
+          templates-${{env.REDOT_BASE_VERSION}}
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: Release Linux Bins
+        path: release/${{env.REDOT_BASE_VERSION}}/**/*
+        retention-days: 30
+

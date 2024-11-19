@@ -9,15 +9,13 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Out cache windows
+    - name: Out cache Windows
       uses: actions/cache@v4
       id: out-cache
       with:
         path: redot-engine/out/windows
-        key: out-windows${{env.REDOT_BASE_VERSION}}-${{github.ref}}-${{github.sha}}
+        key: out-windows-${{env.REDOT_BASE_VERSION}}
         restore-keys: |
-          out-windows-${{env.REDOT_BASE_VERSION}}-${{github.ref}}-${{github.sha}}
-          out-windows-${{env.REDOT_BASE_VERSION}}-${{github.ref}}
           out-windows-${{env.REDOT_BASE_VERSION}}
 
     - name: Build Windows
