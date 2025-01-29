@@ -14,7 +14,7 @@ runs:
       id: out-cache
       with:
         path: redot-engine/out/linux
-        key: out-linux$-{{env.REDOT_BASE_VERSION}}
+        key: out-linux-${{env.REDOT_BASE_VERSION}}
         restore-keys: |
           out-linux-${{env.REDOT_BASE_VERSION}}
 
