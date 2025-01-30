@@ -29,7 +29,7 @@ on:
         description: "Build container tag"
         required: true
         type: string
-        default: "4.3-40"
+        default: "4.3-41"
 
 # Global Settings
 # SCONS_CACHE for windows must be set in the build environment
@@ -47,6 +47,8 @@ env:
 jobs:
   tarball:
     runs-on: [self-hosted]
+    container:
+      image: ghcr.io/trashguy/redot-linux:${{ github.event.inputs.container-tag }}
     env:
       REDOT_VERSION: ${{ github.event.inputs.version }}
     steps:

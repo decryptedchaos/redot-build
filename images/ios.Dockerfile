@@ -6,7 +6,7 @@ ADD files /root/files
 
 FROM ${osx_image}
 
-ENV IOS_SDK=17.5
+ENV IOS_SDK=18.2
 
 COPY --from=files /root/files/  /root/files/
 
@@ -15,7 +15,7 @@ RUN dnf -y install --setopt=install_weak_deps=False \
 
 RUN git clone --progress https://github.com/tpoechtrager/cctools-port && \
     cd /root/cctools-port && \
-    git checkout a98286d858210b209395624477533c0bde05556a && \
+    git checkout 81f205e8ca6bbf2fdbcb6948132454fd1f97839e && \
     # arm64 device
     usage_examples/ios_toolchain/build.sh /root/files/iPhoneOS${IOS_SDK}.sdk.tar.xz arm64 && \
     mkdir -p /root/ioscross/arm64 && \

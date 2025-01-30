@@ -11,7 +11,7 @@ on:
         description: "Fedora version, yea yea Fedora sucks eg 40"
         required: true
         type: string
-        default: "40"
+        default: "41"
 
 env:
   REGISTRY: ghcr.io
