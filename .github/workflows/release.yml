@@ -31,10 +31,6 @@ on:
         type: string
         default: "4.3-40"
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 # Global Settings
 # SCONS_CACHE for windows must be set in the build environment
 # TODO move mono builds to Redot ones
@@ -54,7 +50,12 @@ jobs:
     env:
       REDOT_VERSION: ${{ github.event.inputs.version }}
     steps:
-      - uses: asilbek99/action-cleanup@v1
+
+      # Cleanup for self-hosted bois running all the time
+      - name: 'Cleanup build folder'
+        run: |
+          rm -rf ./* || true
+          rm -rf ./.??* || true
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -142,7 +143,7 @@ jobs:
     needs: mono-glue
     runs-on: [self-hosted]
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+      group: linux-${{ github.ref }}
       cancel-in-progress: true
     container:
       image: ghcr.io/trashguy/redot-linux:${{ github.event.inputs.container-tag }}
@@ -198,7 +199,7 @@ jobs:
     needs: mono-glue
     runs-on: [ self-hosted ]
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+      group: windows-${{ github.ref }}
       cancel-in-progress: true
     container:
       image: ghcr.io/trashguy/redot-windows:${{ github.event.inputs.container-tag }}
@@ -309,7 +310,7 @@ jobs:
     needs: mono-glue
     runs-on: [self-hosted]
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+      group: web-${{ github.ref }}
       cancel-in-progress: true
     container:
       image: ghcr.io/trashguy/redot-web:${{ github.event.inputs.container-tag }}
@@ -353,10 +354,13 @@ jobs:
     name: Build Release Linux
     needs: linux
     runs-on: [self-hosted]
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
     steps:
+      # Cleanup for self-hosted bois running all the time
+      - name: 'Cleanup build folder'
+        run: |
+          rm -rf ./* || true
+          rm -rf ./.??* || true
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -367,10 +371,13 @@ jobs:
     name: Build Release Windows
     needs: windows
     runs-on: [self-hosted]
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
     steps:
+      # Cleanup for self-hosted bois running all the time
+      - name: 'Cleanup build folder'
+        run: |
+          rm -rf ./* || true
+          rm -rf ./.??* || true
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -381,10 +388,13 @@ jobs:
     name: Build Release Web
     needs: web
     runs-on: [self-hosted]
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
     steps:
+      # Cleanup for self-hosted bois running all the time
+      - name: 'Cleanup build folder'
+        run: |
+          rm -rf ./* || true
+          rm -rf ./.??* || true
+
       - name: Checkout repository
         uses: actions/checkout@v4
 

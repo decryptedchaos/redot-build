@@ -1,0 +1,3 @@
+[submodule ".github/actions/action-cleanup"]
+	path = .github/actions/action-cleanup
+	url = https://github.com/asilbek99/action-cleanup.git
