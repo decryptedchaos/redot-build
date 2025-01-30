@@ -33,6 +33,7 @@ runs:
       run: |
         mkdir -p templates/mono
         mkdir -p release/mono
+        
         ## Windows (Classical) ##
       
         # Editor
@@ -130,13 +131,11 @@ runs:
     - name: Update templates cache
       uses: actions/cache/save@v4
       with:
-        path: templates
+        path: redot-engine/templates
         key: templates-${{env.REDOT_BASE_VERSION}}
-        restore-keys: |
-          templates-${{env.REDOT_BASE_VERSION}}
 
     - uses: actions/upload-artifact@v4
       with:
         name: Release Windows Bins
-        path: release/${{env.REDOT_BASE_VERSION}}/**/*
+        path: redot-engine/release/**/*
         retention-days: 30

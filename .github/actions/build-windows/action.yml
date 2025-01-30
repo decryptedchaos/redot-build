@@ -114,3 +114,10 @@ runs:
         mkdir -p out/windows/arm64/templates-mono
         cp -rvp bin/* out/windows/arm64/templates-mono
         rm -rf bin
+
+    - name: Out cache windows save
+      uses: actions/cache/save@v4
+      id: out-cache-save
+      with:
+        path: redot-engine/out/windows
+        key: out-windows-${{env.REDOT_BASE_VERSION}}

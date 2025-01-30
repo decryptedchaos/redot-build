@@ -42,30 +42,30 @@ runs:
         zip -q -9 "release/${binname}.zip" ${binname}
         rm ${binname}
       
-        # binname="${{ env.REDOT_BASENAME }}_linux.x86_32"
-        # cp out/linux/x86_32/tools/redot.linuxbsd.editor.x86_32 ${binname}
-        # zip -q -9 "release/${binname}.zip" ${binname}
-        # rm ${binname}
-         
-        # binname="${{ env.REDOT_BASENAME }}_linux.arm64"
-        # cp out/linux/arm64/tools/redot.linuxbsd.editor.arm64 ${binname}
-        # zip -q -9 "release/${binname}.zip" ${binname}
-        # rm ${binname}
-         
-        # binname="${{ env.REDOT_BASENAME }}_linux.arm32"
-        # cp out/linux/arm32/tools/redot.linuxbsd.editor.arm32 ${binname}
-        # zip -q -9 "release/${binname}.zip" ${binname}
-        # rm ${binname}
+        binname="${{ env.REDOT_BASENAME }}_linux.x86_32"
+        cp out/linux/x86_32/tools/redot.linuxbsd.editor.x86_32 ${binname}
+        zip -q -9 "release/${binname}.zip" ${binname}
+        rm ${binname}
+        
+        binname="${{ env.REDOT_BASENAME }}_linux.arm64"
+        cp out/linux/arm64/tools/redot.linuxbsd.editor.arm64 ${binname}
+        zip -q -9 "release/${binname}.zip" ${binname}
+        rm ${binname}
+        
+        binname="${{ env.REDOT_BASENAME }}_linux.arm32"
+        cp out/linux/arm32/tools/redot.linuxbsd.editor.arm32 ${binname}
+        zip -q -9 "release/${binname}.zip" ${binname}
+        rm ${binname}
       
         # Templates
         cp out/linux/x86_64/templates/redot.linuxbsd.template_release.x86_64 templates/linux_release.x86_64
         cp out/linux/x86_64/templates/redot.linuxbsd.template_debug.x86_64 templates/linux_debug.x86_64
-        # cp out/linux/x86_32/templates/redot.linuxbsd.template_release.x86_32 templates/linux_release.x86_32
-        # cp out/linux/x86_32/templates/redot.linuxbsd.template_debug.x86_32 templates/linux_debug.x86_32
-        # cp out/linux/arm64/templates/redot.linuxbsd.template_release.arm64 templates/linux_release.arm64
-        # cp out/linux/arm64/templates/redot.linuxbsd.template_debug.arm64 templates/linux_debug.arm64
-        # cp out/linux/arm32/templates/redot.linuxbsd.template_release.arm32 templates/linux_release.arm32
-        # cp out/linux/arm32/templates/redot.linuxbsd.template_debug.arm32 templates/linux_debug.arm32
+        cp out/linux/x86_32/templates/redot.linuxbsd.template_release.x86_32 templates/linux_release.x86_32
+        cp out/linux/x86_32/templates/redot.linuxbsd.template_debug.x86_32 templates/linux_debug.x86_32
+        cp out/linux/arm64/templates/redot.linuxbsd.template_release.arm64 templates/linux_release.arm64
+        cp out/linux/arm64/templates/redot.linuxbsd.template_debug.arm64 templates/linux_debug.arm64
+        cp out/linux/arm32/templates/redot.linuxbsd.template_release.arm32 templates/linux_release.arm32
+        cp out/linux/arm32/templates/redot.linuxbsd.template_debug.arm32 templates/linux_debug.arm32
         
         ## Linux (Mono) ##
         
@@ -77,43 +77,41 @@ runs:
         zip -r -q -9 "release/mono/${binbasename}_x86_64.zip" ${binbasename}_x86_64
         rm -rf ${binbasename}_x86_64
       
-        # binbasename="${{ env.REDOT_BASENAME }}_mono_linux"
-        # mkdir -p ${binbasename}_x86_32
-        # cp out/linux/x86_32/tools-mono/redot.linuxbsd.editor.x86_32.mono ${binbasename}_x86_32/${binbasename}.x86_32
-        # cp -rp out/linux/x86_32/tools-mono/GodotSharp/ ${binbasename}_x86_32/
-        # zip -r -q -9 "release/mono/${binbasename}_x86_32.zip" ${binbasename}_x86_32
-        # rm -rf ${binbasename}_x86_32
-        # 
-        # binbasename="${{ env.REDOT_BASENAME }}_mono_linux"
-        # mkdir -p ${binbasename}_arm64
-        # cp out/linux/arm64/tools-mono/redot.linuxbsd.editor.arm64.mono ${binbasename}_arm64/${binbasename}.arm64
-        # cp -rp out/linux/arm64/tools-mono/GodotSharp/ ${binbasename}_arm64/
-        # zip -r -q -9 "release/mono/${binbasename}_arm64.zip" ${binbasename}_arm64
-        # rm -rf ${binbasename}_arm64
-        # 
-        # binbasename="${{ env.REDOT_BASENAME }}_mono_linux"
-        # mkdir -p ${binbasename}_arm32
-        # cp out/linux/arm32/tools-mono/redot.linuxbsd.editor.arm32.mono ${binbasename}_arm32/${binbasename}.arm32
-        # cp -rp out/linux/arm32/tools-mono/GodotSharp/ ${binbasename}_arm32/
-        # zip -r -q -9 "release/mono/${binbasename}_arm32.zip" ${binbasename}_arm32
-        # rm -rf ${binbasename}_arm32
+        binbasename="${{ env.REDOT_BASENAME }}_mono_linux"
+        mkdir -p ${binbasename}_x86_32
+        cp out/linux/x86_32/tools-mono/redot.linuxbsd.editor.x86_32.mono ${binbasename}_x86_32/${binbasename}.x86_32
+        cp -rp out/linux/x86_32/tools-mono/GodotSharp/ ${binbasename}_x86_32/
+        zip -r -q -9 "release/mono/${binbasename}_x86_32.zip" ${binbasename}_x86_32
+        rm -rf ${binbasename}_x86_32
+        
+        binbasename="${{ env.REDOT_BASENAME }}_mono_linux"
+        mkdir -p ${binbasename}_arm64
+        cp out/linux/arm64/tools-mono/redot.linuxbsd.editor.arm64.mono ${binbasename}_arm64/${binbasename}.arm64
+        cp -rp out/linux/arm64/tools-mono/GodotSharp/ ${binbasename}_arm64/
+        zip -r -q -9 "release/mono/${binbasename}_arm64.zip" ${binbasename}_arm64
+        rm -rf ${binbasename}_arm64
+        
+        binbasename="${{ env.REDOT_BASENAME }}_mono_linux"
+        mkdir -p ${binbasename}_arm32
+        cp out/linux/arm32/tools-mono/redot.linuxbsd.editor.arm32.mono ${binbasename}_arm32/${binbasename}.arm32
+        cp -rp out/linux/arm32/tools-mono/GodotSharp/ ${binbasename}_arm32/
+        zip -r -q -9 "release/mono/${binbasename}_arm32.zip" ${binbasename}_arm32
+        rm -rf ${binbasename}_arm32
       
         # Templates
         cp out/linux/x86_64/templates-mono/redot.linuxbsd.template_debug.x86_64.mono templates/mono/linux_debug.x86_64
         cp out/linux/x86_64/templates-mono/redot.linuxbsd.template_release.x86_64.mono templates/mono/linux_release.x86_64
-        # cp out/linux/x86_32/templates-mono/redot.linuxbsd.template_debug.x86_32.mono templates/mono/linux_debug.x86_32
-        # cp out/linux/x86_32/templates-mono/redot.linuxbsd.template_release.x86_32.mono templates/mono/linux_release.x86_32
-        # cp out/linux/arm64/templates-mono/redot.linuxbsd.template_debug.arm64.mono templates/mono/linux_debug.arm64
-        # cp out/linux/arm64/templates-mono/redot.linuxbsd.template_release.arm64.mono templates/mono/linux_release.arm64
-        # cp out/linux/arm32/templates-mono/redot.linuxbsd.template_debug.arm32.mono templates/mono/linux_debug.arm32
-        # cp out/linux/arm32/templates-mono/redot.linuxbsd.template_release.arm32.mono templates/mono/linux_release.arm32
+        cp out/linux/x86_32/templates-mono/redot.linuxbsd.template_debug.x86_32.mono templates/mono/linux_debug.x86_32
+        cp out/linux/x86_32/templates-mono/redot.linuxbsd.template_release.x86_32.mono templates/mono/linux_release.x86_32
+        cp out/linux/arm64/templates-mono/redot.linuxbsd.template_debug.arm64.mono templates/mono/linux_debug.arm64
+        cp out/linux/arm64/templates-mono/redot.linuxbsd.template_release.arm64.mono templates/mono/linux_release.arm64
+        cp out/linux/arm32/templates-mono/redot.linuxbsd.template_debug.arm32.mono templates/mono/linux_debug.arm32
+        cp out/linux/arm32/templates-mono/redot.linuxbsd.template_release.arm32.mono templates/mono/linux_release.arm32
 
-        ls -lash release
-        
     - name: Update templates cache
       uses: actions/cache/save@v4
       with:
-        path: templates
+        path: redot-engine/templates
         key: templates-${{env.REDOT_BASE_VERSION}}
 
     - uses: actions/upload-artifact@v4
