@@ -7,15 +7,14 @@ runs:
       uses: actions/cache@v4
       id: out-cache
       with:
-        path: redot-engine/out/web
-        key: out-web-${{env.REDOT_BASE_VERSION}}
+        path: redot-engine/redot-engine/out/web
+        key: out-web-${{env.redot-BASE_VERSION}}
         restore-keys: |
-          out-web-${{env.REDOT_BASE_VERSION}}
+          out-web-${{env.redot-BASE_VERSION}}
 
     - name: Build Macos
-      working-directory: redot-engine
       shell: bash
-      run: |
+      run: |      
         declare -a JOBS=(
           "target=template_debug"
           "target=template_release"
@@ -34,14 +33,15 @@ runs:
         echo "Starting classical build for Web..."
         
         for i in {0..3}; do
-          cp -r godot godot$i
-          cd godot$i
+          cp -r redot-engine redot-engine$i
+          cd redot-engine$i
           echo "$SCONS platform=web ${OPTIONS} ${JOBS[$i]}"
           $SCONS platform=web ${OPTIONS} ${JOBS[$i]} &
           pids[$i]=$!
+          cd ..
         done
       
-        cd godot
+        cd redot-engine
         echo "$SCONS platform=web ${OPTIONS} target=editor use_closure_compiler=yes"
         $SCONS platform=web ${OPTIONS} target=editor use_closure_compiler=yes &
         pid_editor=$!
@@ -51,9 +51,10 @@ runs:
         done
         wait $pid_editor
       
+        cd ..
         for i in {0..3}; do
-          cp -r godot godot-nothreads$i
-          cd godot-nothreads$i
+          cp -r redot-engine redot-engine-nothreads$i
+          cd redot-engine-nothreads$i
           echo "$SCONS platform=web ${OPTIONS} ${JOBS_NOTHREADS[$i]}"
           $SCONS platform=web ${OPTIONS} ${JOBS_NOTHREADS[$i]} &
           pids_nothreads[$i]=$!
@@ -63,13 +64,13 @@ runs:
           wait $pid
         done
       
-        mkdir -p out/web/tools
-        cp -rvp godot/bin/*.editor*.zip out/web/tools
+        mkdir -p redot-engine/out/web/tools
+        cp -rvp redot-engine/bin/*.editor*.zip redot-engine/out/web/tools
       
-        mkdir -p out/web/templates
+        mkdir -p redot-engine/out/web/templates
         for i in {0..3}; do
-          cp -rvp godot$i/bin/*.zip out/web/templates
-          cp -rvp godot-nothreads$i/bin/*.zip out/web/templates
+          cp -rvp redot-engine$i/bin/*.zip redot-engine/out/web/templates
+          cp -rvp redot-engine-nothreads$i/bin/*.zip redot-engine/out/web/templates
         done
         
         echo "Starting Mono build for Web..."
@@ -79,6 +80,6 @@ runs:
         $SCONS platform=web ${OPTIONS} ${OPTIONS_MONO} target=template_debug
         $SCONS platform=web ${OPTIONS} ${OPTIONS_MONO} target=template_release
       
-        mkdir -p out/web/templates-mono
-        cp -rvp bin/*.zip out/web/templates-mono
+        mkdir -p redot-engine/out/web/templates-mono
+        cp -rvp bin/*.zip redot-engine/out/web/templates-mono
         rm -f bin/*.zip

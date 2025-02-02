@@ -14,21 +14,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Set up Python 3.x
-      uses: actions/setup-python@v4
-      with:
-        # Semantic version range syntax or exact version of a Python version
-        python-version: ${{ inputs.python-version }}
-        # Optional - x64 or x86 architecture, defaults to x64
-        architecture: ${{ inputs.python-arch }}
-
-    - name: Setup scons
-      shell: bash
-      run: |
-        python -c "import sys; print(sys.version)"
-        python -m pip install scons
-        scons --version
-
     - name: MoltenVK
       shell: bash
       working-directory: ${{ inputs.working }}
