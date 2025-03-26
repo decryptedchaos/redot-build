@@ -73,7 +73,7 @@ jobs:
       - name: Checkout Redot source
         uses: actions/checkout@v4
         with:
-          repository: Redot-Engine/redot-engine
+          repository: Redot-Experimental/ReX
           fetch-tags: true
           ref: ${{ github.event.inputs.git-tag }}
           path: redot-engine
