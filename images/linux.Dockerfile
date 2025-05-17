@@ -33,3 +33,4 @@ RUN dnf install -y wayland-devel && \
     ./relocate-sdk.sh
 
 CMD /bin/bash
+

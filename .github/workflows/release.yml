@@ -138,63 +138,63 @@ jobs:
           dotnet --info
           ${SCONS} platform=linuxbsd ${OPTIONS} target=editor module_mono_enabled=yes
           bin/redot.linuxbsd.editor.x86_64.mono --headless --generate-mono-glue mono-glue
-
-  linux:
-    name: Linux ${{ matrix.name }}
-    needs: mono-glue
-    runs-on: [self-hosted]
-    concurrency:
-      group: linux-${{ github.ref }}
-      cancel-in-progress: true
-    container:
-      image: ghcr.io/trashguy/redot-linux:${{ github.event.inputs.container-tag }}
-    env:
-      SCONS: scons  verbose=yes warnings=no progress=no
-      OPTIONS: production=yes
-      OPTIONS_MONO: module_mono_enabled=yes
-    strategy:
-      fail-fast: false
-      max-parallel: 1
-      matrix:
-        include:
-          - name: Editor & Templates
-            cache-name: linux
-            build-mono: false
-          - name: Editor & Templates w/ Mono
-            cache-name: linux-mono
-            build-mono: true
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Get source cache
-        uses: actions/cache/restore@v4
-        with:
-          path: redot-engine
-          key: redot-engine-${{env.REDOT_BASE_VERSION}}
-          restore-keys: |
-            redot-engine-${{env.REDOT_BASE_VERSION}}
-
-      - name: Mono cache
-        uses: actions/cache/restore@v4
-        with:
-          path: redot-engine/mono-glue
-          key: redot-engine-mono-${{env.REDOT_BASE_VERSION}}
-          restore-keys: |
-            redot-engine-mono-${{env.REDOT_BASE_VERSION}}
-
-      - name: Setup Redot build cache
-        uses: ./.github/actions/scons-cache
-        with:
-          cache-name: ${{ matrix.cache-name }}
-        continue-on-error: true
-
-      - name: Build Linux Editor and Templates
-        uses: ./.github/actions/build-linux
-        with:
-          mono: ${{ matrix.build-mono }}
-
+  #
+  # linux:
+  #   name: Linux ${{ matrix.name }}
+  #   needs: mono-glue
+  #   runs-on: [self-hosted]
+  #   concurrency:
+  #     group: linux-${{ github.ref }}
+  #     cancel-in-progress: true
+  #   container:
+  #     image: ghcr.io/trashguy/redot-linux:${{ github.event.inputs.container-tag }}
+  #   env:
+  #     SCONS: scons  verbose=yes warnings=no progress=no
+  #     OPTIONS: production=yes
+  #     OPTIONS_MONO: module_mono_enabled=yes
+  #   strategy:
+  #     fail-fast: false
+  #     max-parallel: 1
+  #     matrix:
+  #       include:
+  #         - name: Editor & Templates
+  #           cache-name: linux
+  #           build-mono: false
+  #         - name: Editor & Templates w/ Mono
+  #           cache-name: linux-mono
+  #           build-mono: true
+  #
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Get source cache
+  #       uses: actions/cache/restore@v4
+  #       with:
+  #         path: redot-engine
+  #         key: redot-engine-${{env.REDOT_BASE_VERSION}}
+  #         restore-keys: |
+  #           redot-engine-${{env.REDOT_BASE_VERSION}}
+  #
+  #     - name: Mono cache
+  #       uses: actions/cache/restore@v4
+  #       with:
+  #         path: redot-engine/mono-glue
+  #         key: redot-engine-mono-${{env.REDOT_BASE_VERSION}}
+  #         restore-keys: |
+  #           redot-engine-mono-${{env.REDOT_BASE_VERSION}}
+  #
+  #     - name: Setup Redot build cache
+  #       uses: ./.github/actions/scons-cache
+  #       with:
+  #         cache-name: ${{ matrix.cache-name }}
+  #       continue-on-error: true
+  #
+  #     - name: Build Linux Editor and Templates
+  #       uses: ./.github/actions/build-linux
+  #       with:
+  #         mono: ${{ matrix.build-mono }}
+  #
   windows:
     name: Windows ${{ matrix.name }}
     needs: mono-glue
@@ -206,7 +206,7 @@ jobs:
       image: ghcr.io/trashguy/redot-windows:${{ github.event.inputs.container-tag }}
     env:
       SCONS: scons verbose=yes warnings=no progress=no
-      OPTIONS: production=yes use_mingw=yes angle_libs=deps/angle mesa_libs=deps/mesa d3d12=yes
+      OPTIONS: production=yes use_mingw=yes angle_libs=deps/angle mesa_libs=deps/mesa d3d12=yes accesskit_sdk_path=deps/accesskit-c
       OPTIONS_MONO: module_mono_enabled=yes
       OPTIONS_LLVM: use_llvm=yes mingw_prefix=/root/llvm-mingw
       STEAM: 0
@@ -309,66 +309,66 @@ jobs:
 #        with:
 #          mono: ${{ matrix.build-mono }}
 #
-  web:
-    name: Web
-    needs: mono-glue
-    runs-on: [self-hosted]
-    concurrency:
-      group: web-${{ github.ref }}
-      cancel-in-progress: true
-    container:
-      image: ghcr.io/trashguy/redot-web:${{ github.event.inputs.container-tag }}
-    env:
-      SCONS: scons  verbose=yes warnings=no progress=no
-      OPTIONS: production=yes
-      OPTIONS_MONO: module_mono_enabled=yes
+#  web:
+#    name: Web
+#    needs: mono-glue
+#    runs-on: [self-hosted]
+#    concurrency:
+#      group: web-${{ github.ref }}
+#      cancel-in-progress: true
+#    container:
+#      image: ghcr.io/trashguy/redot-web:${{ github.event.inputs.container-tag }}
+#    env:
+#      SCONS: scons  verbose=yes warnings=no progress=no
+#      OPTIONS: production=yes
+#      OPTIONS_MONO: module_mono_enabled=yes
+#
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v4
+#
+#      - name: Get source cache
+#        uses: actions/cache/restore@v4
+#        with:
+#          path: redot-engine
+#          key: redot-engine-${{env.REDOT_BASE_VERSION}}
+#          restore-keys: |
+#            redot-engine-${{env.REDOT_BASE_VERSION}}
+#
+#      - name: Mono cache
+#        uses: actions/cache/restore@v4
+#        with:
+#          path: redot-engine/mono-glue
+#          key: redot-engine-mono-${{env.REDOT_BASE_VERSION}}
+#          restore-keys: |
+#            redot-engine-mono-${{env.REDOT_BASE_VERSION}}
+#
+#      - name: Setup Redot build cache
+#        uses: ./.github/actions/scons-cache
+#        with:
+#          cache-name: ${{ matrix.cache-name }}
+#        continue-on-error: true
+#
+#      - name: Build web Editor and Templates
+#        uses: ./.github/actions/build-web
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Get source cache
-        uses: actions/cache/restore@v4
-        with:
-          path: redot-engine
-          key: redot-engine-${{env.REDOT_BASE_VERSION}}
-          restore-keys: |
-            redot-engine-${{env.REDOT_BASE_VERSION}}
-
-      - name: Mono cache
-        uses: actions/cache/restore@v4
-        with:
-          path: redot-engine/mono-glue
-          key: redot-engine-mono-${{env.REDOT_BASE_VERSION}}
-          restore-keys: |
-            redot-engine-mono-${{env.REDOT_BASE_VERSION}}
-
-      - name: Setup Redot build cache
-        uses: ./.github/actions/scons-cache
-        with:
-          cache-name: ${{ matrix.cache-name }}
-        continue-on-error: true
-
-      - name: Build web Editor and Templates
-        uses: ./.github/actions/build-web
-
-  build-release-linux:
-    name: Build Release Linux
-    needs: linux
-    runs-on: [self-hosted]
-    steps:
-      # Cleanup for self-hosted bois running all the time
-      - name: 'Cleanup build folder'
-        run: |
-          rm -rf ./* || true
-          rm -rf ./.??* || true
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Build Linux Release
-        uses: ./.github/actions/build-release-linux
-
+  # build-release-linux:
+  #   name: Build Release Linux
+  #   needs: linux
+  #   runs-on: [self-hosted]
+  #   steps:
+  #     # Cleanup for self-hosted bois running all the time
+  #     - name: 'Cleanup build folder'
+  #       run: |
+  #         rm -rf ./* || true
+  #         rm -rf ./.??* || true
+  #
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Build Linux Release
+  #       uses: ./.github/actions/build-release-linux
+  #
   build-release-windows:
     name: Build Release Windows
     needs: windows
@@ -386,19 +386,4 @@ jobs:
       - name: Build Linux Release
         uses: ./.github/actions/build-release-windows
 
-  build-release-web:
-    name: Build Release Web
-    needs: web
-    runs-on: [self-hosted]
-    steps:
-      # Cleanup for self-hosted bois running all the time
-      - name: 'Cleanup build folder'
-        run: |
-          rm -rf ./* || true
-          rm -rf ./.??* || true
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Build Linux Release
-        uses: ./.github/actions/build-release-web
+#v

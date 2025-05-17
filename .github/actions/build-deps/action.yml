@@ -29,6 +29,20 @@ runs:
           popd
         fi
 
+    - name: Accesskit-c
+      shell: bash
+      working-directory: ${{ inputs.working }}
+      run: |
+        if [ ! -d "deps/accesskit" ]; then
+          echo "Missing accesskit, downloading it."
+          mkdir -p deps/accesskit
+          pushd deps/accesskit
+          curl -L -o accesskit.zip https://github.com/godotengine/godot-accesskit-c-static/releases/download/0.15.1/accesskit-c-0.15.1.zip
+          unzip -o accesskit.zip && rm -f accesskit.zip
+          mv accesskit-c-* accesskit-c
+          popd
+        fi
+
     - name: Angle
       shell: bash
       working-directory: ${{ inputs.working }}
@@ -65,5 +79,18 @@ runs:
           unzip -o mesa_arm64.zip && rm -f mesa_arm64.zip
           unzip -o mesa_x86_64.zip && rm -f mesa_x86_64.zip
           unzip -o mesa_x86_32.zip && rm -f mesa_x86_32.zip
+          popd
+        fi
+
+    - name: Swappy
+      shell: bash
+      working-directory: ${{ inputs.working }}
+      run: |
+        if [ ! -d "deps/swappy" ]; then
+          echo "Missing Swappy libraries, downloading them."
+          mkdir -p deps/swappy
+          pushd deps/swappy
+          curl -L -O https://github.com/godotengine/godot-swappy/releases/download/from-source-2025-01-31/godot-swappy.7z
+          7z x godot-swappy.7z && rm godot-swappy.7z
           popd
         fi
